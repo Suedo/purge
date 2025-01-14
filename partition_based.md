@@ -136,3 +136,153 @@ public class PartitionPurger {
     ```
 
 By automating the purging process with a combination of **Interval Partitioning** and **Spring Boot scheduling**, this approach keeps the database performant while reducing manual intervention.
+
+### Refined Springboot Logic with @Transactional and @Retryable
+
+Here’s the pseudocode for the refactored solution using `@Retryable`:
+
+#### Pseudocode: Partition Purging with Retryable Logic
+
+```plaintext
+Function purgeOldPartitions():
+    Try:
+        identifiedPartitions = fetchPartitionsOlderThan(5 months)
+        If identifiedPartitions is empty:
+            Log "No partitions found for purging."
+            Return
+
+        For each partition in identifiedPartitions:
+            Call dropPartition(partition)  // @Retryable handles retries if needed
+
+        Log "Successfully purged partitions."
+
+    Catch Exception:
+        Log "Failed to purge partitions. Transaction rolled back."
+        Throw Exception to ensure rollback
+
+
+@Retryable(maxAttempts = 3, backoffDelay = 2000)
+Function dropPartition(partition):
+    Execute SQL: ALTER TABLE transactions DROP PARTITION partition
+    Log "Dropped partition: partition"
+```
+
+---
+
+#### Key Points in Pseudocode
+
+1. **`purgeOldPartitions` Logic**:
+
+   - Fetches all partitions older than 5 months from metadata.
+   - Iterates over the list of partitions and calls `dropPartition` for each.
+   - Logs the success or failure of the overall purging operation.
+
+2. **`dropPartition` with `@Retryable`**:
+
+   - Retries up to 3 times with a 2-second delay between attempts if any exception occurs.
+   - Logs success after successfully dropping a partition.
+
+3. **Transactional Integrity**:
+
+   - Any failure during the purging process rolls back the transaction to maintain atomicity.
+
+4. **Resilience**:
+   - Transient issues (e.g., network failures) are automatically handled by `@Retryable`.
+
+---
+
+#### Example Flow
+
+1. **Scenario: All Partitions Dropped Successfully**
+
+   ```
+   Fetch partitions: ["PARTITION_2023_01", "PARTITION_2023_02"]
+   Dropping partition: PARTITION_2023_01
+   Log: "Dropped partition: PARTITION_2023_01"
+   Dropping partition: PARTITION_2023_02
+   Log: "Dropped partition: PARTITION_2023_02"
+   Log: "Successfully purged partitions."
+   ```
+
+2. **Scenario: Temporary Network Failure**
+
+   ```
+   Fetch partitions: ["PARTITION_2023_01", "PARTITION_2023_02"]
+   Dropping partition: PARTITION_2023_01
+   Attempt 1 failed to drop partition: PARTITION_2023_01
+   Attempt 2 failed to drop partition: PARTITION_2023_01
+   Attempt 3 succeeded: Dropped partition: PARTITION_2023_01
+   Dropping partition: PARTITION_2023_02
+   Log: "Dropped partition: PARTITION_2023_02"
+   Log: "Successfully purged partitions."
+   ```
+
+3. **Scenario: Fatal Error (No Retry)**
+   ```
+   Fetch partitions: ["PARTITION_2023_01", "PARTITION_2023_02"]
+   Dropping partition: PARTITION_2023_01
+   Attempt 1 failed to drop partition: PARTITION_2023_01
+   Attempt 2 failed to drop partition: PARTITION_2023_01
+   Attempt 3 failed to drop partition: PARTITION_2023_01
+   Log: "Failed to purge partitions. Transaction rolled back."
+   ```
+
+### Java code for above Pseudocode
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class PartitionPurger {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public void purgeOldPartitions() {
+        try {
+            // Step 1: Query metadata to find partitions older than 5 months
+            String fetchPartitionsSql = """
+                SELECT partition_name
+                FROM user_tab_partitions
+                WHERE table_name = 'TRANSACTIONS'
+                  AND TO_DATE(high_value, 'SYYYY-MM-DD HH24:MI:SS') < ADD_MONTHS(SYSDATE, -5)
+            """;
+
+            List<String> partitionsToDrop = jdbcTemplate.query(fetchPartitionsSql,
+                (rs, rowNum) -> rs.getString("partition_name"));
+
+            if (partitionsToDrop.isEmpty()) {
+                System.out.println("No partitions found for purging.");
+                return;
+            }
+
+            // Step 2: Drop identified partitions with retry
+            for (String partition : partitionsToDrop) {
+                dropPartition(partition); // @Retryable will handle retries for this method
+            }
+
+            System.out.println("Successfully purged partitions: " + partitionsToDrop);
+        } catch (Exception e) {
+            System.err.println("Failed to purge partitions. Transaction rolled back: " + e.getMessage());
+            throw e; // Ensures transaction rollback
+        }
+    }
+
+    @Retryable(
+        value = {Exception.class}, // Retry on any exception
+        maxAttempts = 3,           // Retry up to 3 times
+        backoff = @Backoff(delay = 2000) // Delay 2 seconds between retries
+    )
+    public void dropPartition(String partition) {
+        String dropPartitionSql = "ALTER TABLE transactions DROP PARTITION " + partition;
+        jdbcTemplate.execute(dropPartitionSql);
+        System.out.println("Dropped partition: " + partition);
+    }
+}
+```
