@@ -4,7 +4,7 @@
 
 Different teams managed `stored procedures` in different ways, and need arose for a standardized solution, particularly for sensitive data compliance. A Java-based solution addresses these challenges effectively:
 
-- **Version Control & Peer Review**: Ensures changes are traceable, reviewed, and maintainable within a structured process.
+- **Version Control & Peer Review**: Ensures changes are traceable, reviewed, and maintainable via a structured process.
 - **Standardization**: Centralizes logic for consistency and avoids team-specific fragmentation.
 - **Auditability**: Provides detailed logs for compliance and monitoring.
 - **Scalability & Flexibility**: Supports multiple databases, dynamic configurations, and integration with archival systems.
@@ -21,7 +21,7 @@ A common platform to archive and delete data records past their retention period
 ## **Key Features**
 
 - **Dry-Run Capability**: Previews the impact of purging (e.g., number of rows to delete).
-- **Distributed Locking**: Ensures no concurrent execution on the same table.
+- **Distributed Locking**: If Purge is running in HA, Ensures no concurrent purge execution on the same table.
 - **Custom Purge Options**: Dynamic purging stratgies at runtime.
 - **Custom Archival Options**: Dynamic archival stratgies at runtime.
 - **Custom Notification Integration**: Dynamic notification stratgies at runtime.
