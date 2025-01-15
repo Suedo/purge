@@ -18,7 +18,7 @@ This approach enhances compliance, maintainability, and scalability while aligni
 
 A common platform to archive and delete data records past their retention period, built on a flexible framework that supports multiple strategies for purging and archiving.
 
-## **Key Features**
+### **Key Features**
 
 - **Dry-Run Capability**: Previews the impact of purging (e.g., number of rows to delete).
 - **Distributed Locking**: If Purge is running in HA, Ensures no concurrent purge execution on the same table.
@@ -66,7 +66,7 @@ API methods will exist to upload these details in chunks (or whole if needed)
    - Custom SQL `where clause` for arbitrarily complex business logic
    - Audit information.
 
-## Validation
+### Validation
 
 Before Purge can execute, the configurations need to be validated. Validation can be triggered:
 
@@ -106,11 +106,17 @@ Only when validation passes, can the framework be primed for execution. Below is
 - This leads to least number of batches, lowering network and initialization induced latencies
 - Empirically tested to give fastest results :: Intuition: larger batch leads to faster execution
 
+**Flow Diagram**
+
 ![alt text](Flow.png)
 
 ---
 
-## **Row-by-Row Strategy**
+## Custom Deletion Strategies
+
+### **Row-by-Row Strategy**
+
+_This is discussed in the Flow diagram_
 
 - Dynamically identifies rows to purge using the custom `where clause` and timestamp retention logic.
 - Archives data using extracted primary keys before deletion.
@@ -126,9 +132,7 @@ Only when validation passes, can the framework be primed for execution. Below is
 
 - Still slower than Partition/Table drop
 
----
-
-## **By Partition Strategy**
+### **By Partition Strategy**
 
 - Suitable for tables with proper time-range partitions.
 - Drops partitions that are older than the retention period.
@@ -140,5 +144,29 @@ Only when validation passes, can the framework be primed for execution. Below is
 **Cons**:
 
 - Requires all team DB tables to be partitioned through time range : May not be feasible
+
+### **Table Swap Strategy**
+
+Works well when data to delete >> Data to keep
+
+- mark rows NOT for delete
+- move marked rows to temp table
+- DROP Table, and then create a new one with same name
+- move temp rows back to table
+
+**Pros**
+
+- Very fast `Find` stage <- uses a `covered query`
+- Fastest deletion possible
+- No need for partition logic
+
+**Cons**
+
+- Creating TEMP tables, DROP-ing tables : May not get permission
+- RISKY
+
+---
+
+![alt text](OtherStrategies.png)
 
 ---
