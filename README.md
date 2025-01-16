@@ -39,7 +39,7 @@ Below is an overview of the platform architecture:
 - **Blue Region**: Represents the **common framework**, responsible for onboarding, validation, execution, and reporting.
 - **Green Region**: Represents **custom strategies** that are dynamically invoked based on configuration (e.g., deletion by partition or row-by-row).
 
-![alt text](Overview.png)
+![alt text](imgs/Overview.png)
 
 ---
 
@@ -108,7 +108,7 @@ Only when validation passes, can the framework be primed for execution. Below is
 
 **Flow Diagram**
 
-![alt text](Flow.png)
+![alt text](imgs/Flow.png)
 
 ---
 
@@ -167,6 +167,6 @@ Works well when data to delete >> Data to keep
 
 ---
 
-![alt text](OtherStrategies.png)
+![alt text](imgs/OtherStrategies.png)
 
 ---
