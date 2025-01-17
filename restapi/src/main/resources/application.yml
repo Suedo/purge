@@ -1,0 +1,37 @@
+server:
+  port: 8180
+spring:
+  application:
+    name: purgerestapi
+  threads:
+    virtual:
+      enabled: true
+  profiles:
+    include:
+      - purge
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  observations:
+    key-values:
+      application: purgerestapi
+  tracing:
+    enabled: true
+    grpc:
+      enabled: true
+    sampling:
+      probability: 1.0
+
+# custom
+restclient:
+  base-url: http://localhost:8182
+  proxy-enabled: false
