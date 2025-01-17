@@ -1,8 +1,10 @@
 package example.dataretention.restapi;
 
 
-import example.dataretention.shared.domain.TableProperties;
-import example.dataretention.shared.domain.TenantProperties;
+import example.dataretention.shared.config.TableProperties;
+import example.dataretention.shared.config.TenantProperties;
+import example.dataretention.shared.domain.Table;
+import example.dataretention.shared.domain.Tenant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,12 +25,12 @@ public class PurgeController {
     }
 
     @GetMapping("/tenants")
-    public List<TenantProperties.Tenant> getTenantProperties() {
-        return tenantProperties.getTenants();
+    public List<Tenant> getTenantProperties() {
+        return tenantProperties.tenants();
     }
 
     @GetMapping("/tables")
-    public List<TableProperties.Table> getTableProperties() {
-        return tableProperties.getTables();
+    public List<Table> getTableProperties() {
+        return tableProperties.tables();
     }
 }

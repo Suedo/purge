@@ -1,12 +1,10 @@
 package example.dataretention.shared.config;
 
-import example.dataretention.shared.domain.TableProperties;
-import example.dataretention.shared.domain.TenantProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @Slf4j
-@Configuration
+@EnableConfigurationProperties({TenantProperties.class, TableProperties.class})
 public class PurgeConfig {
 
     public final TenantProperties tenantProperties;
@@ -16,7 +14,7 @@ public class PurgeConfig {
         this.tenantProperties = tenantProperties;
         this.tableProperties = tableProperties;
 
-        log.info("tenantProperties: {}", tenantProperties.getTenants().get(0));
-        log.info("tableProperties: {}", tableProperties.getTables().get(0));
+        log.info("tenantProperties: {}", tenantProperties);
+        log.info("tableProperties: {}", tableProperties);
     }
 }
