@@ -9,6 +9,6 @@ import java.util.List;
 
 @Slf4j
 @Component
-@ConfigurationProperties("app.tenants")
+@ConfigurationProperties("tenants")
 public record TenantProperties(List<Tenant> tenants) {
 }

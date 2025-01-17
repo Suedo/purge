@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@ConfigurationProperties("app.tables")
+@ConfigurationProperties("tables")
 public record TableProperties(List<Table> tables) {
 }

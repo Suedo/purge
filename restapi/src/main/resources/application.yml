@@ -6,9 +6,9 @@ spring:
   threads:
     virtual:
       enabled: true
-  profiles:
-    include:
-      - purge
+#  profiles:
+#    include:
+#      - purge
 
 management:
   endpoints:
@@ -35,3 +35,25 @@ management:
 restclient:
   base-url: http://localhost:8182
   proxy-enabled: false
+
+tenants:
+  - tenantId: "tenant1"
+    tenantName: "Tenant One"
+    cron: "0 0 * * *"
+    purge: true
+  - tenantId: "tenant2"
+    tenantName: "Tenant Two"
+    cron: "0 15 * * *"
+    purge: false
+
+tables:
+  - tableName: "table1"
+    retentionPeriod: "30d"
+    clause: "WHERE deleted = false"
+    group: 1
+    subGroup: 0
+  - tableName: "table2"
+    retentionPeriod: "90d"
+    clause: "WHERE active = true"
+    group: 2
+    subGroup: 1
