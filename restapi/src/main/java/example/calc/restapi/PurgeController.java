@@ -1,34 +1,34 @@
 package example.calc.restapi;
 
 
+import example.demo.shared.domain.TableProperties;
 import example.demo.shared.domain.TenantProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
+import java.util.List;
+
+
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/api")
 public class PurgeController {
 
-    private final PurgeService purgeService;
     private final TenantProperties tenantProperties;
+    private final TableProperties tableProperties;
 
-    public PurgeController(PurgeService purgeService, TenantProperties tenantProperties) {
-        this.purgeService = purgeService;
+    public PurgeController(TenantProperties tenantProperties, TableProperties tableProperties) {
         this.tenantProperties = tenantProperties;
-    }
-
-    @GetMapping
-    public ResponseEntity<String> testFlow() {
-        String result = purgeService.testFlow();
-        return ResponseEntity.ok(result);
+        this.tableProperties = tableProperties;
     }
 
     @GetMapping("/tenants")
-    public TenantProperties getTenantProperties() {
-        return tenantProperties;
+    public List<TenantProperties.Tenant> getTenantProperties() {
+        return tenantProperties.getTenants();
+    }
+
+    @GetMapping("/tables")
+    public List<TableProperties.Table> getTableProperties() {
+        return tableProperties.getTables();
     }
 }
