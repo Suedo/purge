@@ -61,6 +61,12 @@
             <artifactId>spring-retry</artifactId>
         </dependency>
 
+        <!-- For property refresh via actuator -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
+            <version>4.2.0</version>
+        </dependency>
 
     </dependencies>
 

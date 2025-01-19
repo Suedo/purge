@@ -14,7 +14,7 @@ multi-tenant:
 app:
   tenants:
     - tenantId: "tenant1"
-      tenantName: "Tenant One"
+      tenantName: "Tenant Alpha"
       cron: "0 0 * * *"
       purge: true
     - tenantId: "tenant2"
