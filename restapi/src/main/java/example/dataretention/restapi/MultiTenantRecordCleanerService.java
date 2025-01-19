@@ -2,14 +2,13 @@ package example.dataretention.restapi;
 
 
 import example.dataretention.restapi.config.MultiTenantProperties;
-import example.dataretention.restapi.config.PurgeDetails;
+import example.dataretention.shared.domain.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,27 +21,19 @@ public class MultiTenantRecordCleanerService {
     private final RedissonClient redissonClient;
     private final JdbcTemplate jdbcTemplate;
     private final MultiTenantProperties multiTenantProperties;
-    private final PurgeDetails purgeDetails;
 
-    public MultiTenantRecordCleanerService(RedissonClient redissonClient, JdbcTemplate jdbcTemplate, MultiTenantProperties multiTenantProperties, PurgeDetails purgeDetails) {
+    public MultiTenantRecordCleanerService(RedissonClient redissonClient, JdbcTemplate jdbcTemplate, MultiTenantProperties multiTenantProperties) {
         this.redissonClient = redissonClient;
         this.jdbcTemplate = jdbcTemplate;
         this.multiTenantProperties = multiTenantProperties;
-        this.purgeDetails = purgeDetails;
     }
 
-    @Scheduled(cron = "0 */2 * * * *") // Every 5 minutes
-    public void cleanOldRecords() {
-        log.info("CRON triggered");
-        // New logic: Dynamic list of clients and tables
-        List<String> clients = List.of("INFOSYS", "TCS");
-        List<String> tables = List.of("FleetData", "EmployeeRequests");
+    public void cleanOldRecords(String tenantName, List<Table> tables) {
+        log.info("CRON triggered: Cleaning old records for tenant {}", tenantName);
 
-        for (String client : clients) {
-            for (String table : tables) {
-                String tableName = client + "_" + table;
-                cleanTableTransactional(tableName);
-            }
+        for (Table table : tables) {
+            String tableFullName = tenantName + "_" + table.tableName();
+            cleanTableTransactional(tableFullName);
         }
     }
 
