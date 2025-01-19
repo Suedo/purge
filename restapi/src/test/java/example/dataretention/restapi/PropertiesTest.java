@@ -1,6 +1,6 @@
 package example.dataretention.restapi;
 
-import example.dataretention.shared.config.TenantProperties;
+import example.dataretention.restapi.config.PurgeDetails;
 import example.dataretention.shared.domain.Tenant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +12,11 @@ import java.util.List;
 public class PropertiesTest {
 
     @Autowired
-    TenantProperties tenantProperties;
+    PurgeDetails purgeDetails;
 
     @Test
     void shouldListTenants() {
-        final List<Tenant> tenants = tenantProperties.tenants();
+        final List<Tenant> tenants = purgeDetails.getTenants();
         System.out.println(tenants.size());
     }
 
