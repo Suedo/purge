@@ -13,23 +13,23 @@ multi-tenant:
 
 app:
   tenants:
-    - tenantId: "tenant1"
-      tenantName: "Tenant Alpha"
-      cron: "0 0 * * *"
+    - tenantId: "1"
+      tenantName: "INFOSYS"
+      cron: "0 */2 * * * *"
       purge: true
-    - tenantId: "tenant2"
-      tenantName: "Tenant Two"
-      cron: "0 15 * * *"
-      purge: false
+    - tenantId: "2"
+      tenantName: "TCS"
+      cron: "0 */2 * * * *"
+      purge: true
 
   tables:
-    - tableName: "table1"
+    - tableName: "FleetData"
       retentionPeriod: "30d"
-      clause: "WHERE deleted = false"
+      clause: "status NOT IN ('In Progress', 'Approved')"
       group: 0
       subGroup: 0
-    - tableName: "table2"
-      retentionPeriod: "90d"
-      clause: "WHERE active = true"
+    - tableName: "EmployeeRequests"
+      retentionPeriod: "30d"
+      clause: "status NOT IN ('In Progress', 'Approved')"
       group: 0
       subGroup: 0
