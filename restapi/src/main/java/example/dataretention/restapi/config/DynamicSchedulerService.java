@@ -2,6 +2,7 @@ package example.dataretention.restapi.config;
 
 import example.dataretention.restapi.MultiTenantRecordCleanerService;
 import example.dataretention.shared.domain.Table;
+import example.dataretention.shared.domain.Tenant;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -28,12 +29,14 @@ public class DynamicSchedulerService {
     @PostConstruct
     public void scheduleTasks() {
         log.info("Initializing dynamic schedulers for tenants...");
-        purgeDetails.getTenants().forEach(tenant -> {
-            String cron = tenant.cron();
-            String tenantName = tenant.tenantName();
-            taskScheduler.schedule(() -> triggerCleaningTask(tenantName, purgeDetails.getTables()), new CronTrigger(cron));
-            log.info("Scheduled cleaning task for tenant {} with cron {}", tenantName, cron);
-        });
+        purgeDetails.getTenants().stream()
+                .filter(Tenant::purge)  // purge is enabled
+                .forEach(tenant -> {
+                    String cron = tenant.cron();
+                    String tenantName = tenant.tenantName();
+                    taskScheduler.schedule(() -> triggerCleaningTask(tenantName, purgeDetails.getTables()), new CronTrigger(cron));
+                    log.info("Scheduled cleaning task for tenant {} with cron {}", tenantName, cron);
+                });
     }
 
     private void triggerCleaningTask(String tenantName, List<Table> tables) {
