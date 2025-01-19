@@ -26,10 +26,10 @@ app:
     - tableName: "table1"
       retentionPeriod: "30d"
       clause: "WHERE deleted = false"
-      group: 1
+      group: 0
       subGroup: 0
     - tableName: "table2"
       retentionPeriod: "90d"
       clause: "WHERE active = true"
-      group: 2
-      subGroup: 1
+      group: 0
+      subGroup: 0
