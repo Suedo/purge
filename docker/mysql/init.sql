@@ -4,33 +4,66 @@ CREATE DATABASE IF NOT EXISTS fleet_management;
 -- Use the fleet_management database
 USE fleet_management;
 
--- Create schema for client-specific tables
-CREATE TABLE JPMC_Employees (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
+CREATE TABLE INFOSYS_FleetData (
+    request_id BIGINT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each fleet request
+    request_type VARCHAR(50) NOT NULL,           -- Type of request (e.g., Maintenance, Fueling, Assignment)
+    vehicle_type VARCHAR(50) NOT NULL,           -- Type of vehicle involved (e.g., Bus, Car, Truck)
+    reservation_date DATE,                       -- Date of reservation, if applicable
+    pickup_location VARCHAR(255),                -- Starting location for the request
+    drop_location VARCHAR(255),                  -- Destination location for the request
+    status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Pending', -- Status of the request
+    description TEXT,                            -- Detailed description of the fleet request
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the request was created
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp of the last update
 );
 
-CREATE TABLE JPMC_Transport (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_type VARCHAR(50),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE TCS_FleetData (
+    request_id BIGINT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each fleet request
+    request_type VARCHAR(50) NOT NULL,           -- Type of request (e.g., Maintenance, Fueling, Assignment)
+    vehicle_type VARCHAR(50) NOT NULL,           -- Type of vehicle involved (e.g., Bus, Car, Truck)
+    reservation_date DATE,                       -- Date of reservation, if applicable
+    pickup_location VARCHAR(255),                -- Starting location for the request
+    drop_location VARCHAR(255),                  -- Destination location for the request
+    status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Pending', -- Status of the request
+    description TEXT,                            -- Detailed description of the fleet request
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the request was created
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp of the last update
 );
 
-CREATE TABLE TCS_Employees (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE INFOSYS_EmployeeRequests (
+    request_id BIGINT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each employee request
+    employee_name VARCHAR(100) NOT NULL,          -- Name of the employee making the request
+    request_type VARCHAR(50) NOT NULL,            -- Type of request (e.g., Booking, Cancellation, Rescheduling)
+    vehicle_type VARCHAR(50) NOT NULL,            -- Type of vehicle requested (e.g., Car, Van, Bus)
+    reservation_date DATE NOT NULL,               -- Date of reservation
+    pickup_location VARCHAR(255) NOT NULL,        -- Starting location for the request
+    drop_location VARCHAR(255) NOT NULL,          -- Destination location for the request
+    status ENUM('Pending', 'Approved', 'Rejected', 'Cancelled') DEFAULT 'Pending', -- Status of the request
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the request was created
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp of the last update
 );
 
-CREATE TABLE TCS_Transport (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_type VARCHAR(50),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE TCS_EmployeeRequests (
+    request_id BIGINT AUTO_INCREMENT PRIMARY KEY, -- Unique identifier for each employee request
+    employee_name VARCHAR(100) NOT NULL,          -- Name of the employee making the request
+    request_type VARCHAR(50) NOT NULL,            -- Type of request (e.g., Booking, Cancellation, Rescheduling)
+    vehicle_type VARCHAR(50) NOT NULL,            -- Type of vehicle requested (e.g., Car, Van, Bus)
+    reservation_date DATE NOT NULL,               -- Date of reservation
+    pickup_location VARCHAR(255) NOT NULL,        -- Starting location for the request
+    drop_location VARCHAR(255) NOT NULL,          -- Destination location for the request
+    status ENUM('Pending', 'Approved', 'Rejected', 'Cancelled') DEFAULT 'Pending', -- Status of the request
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the request was created
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp of the last update
 );
 
--- Insert initial data
-INSERT INTO JPMC_Employees (name) VALUES ('John Doe'), ('Jane Smith');
-INSERT INTO JPMC_Transport (vehicle_type) VALUES ('Bus'), ('Car');
-INSERT INTO TCS_Employees (name) VALUES ('Alice'), ('Bob');
-INSERT INTO TCS_Transport (vehicle_type) VALUES ('Truck'), ('Van');
+
+
+
+-- Insert sample data
+INSERT INTO INFOSYS_FleetData (request_type, vehicle_type, reservation_date, pickup_location, drop_location, status, description)
+VALUES ('Maintenance', 'Car', '2025-01-10', 'Bangalore', 'Hyderabad', 'Completed', 'Routine checkup'),
+       ('Fueling', 'Bus', '2025-01-11', 'Mumbai', 'Pune', 'In Progress', 'Fueling during transit');
+
+INSERT INTO TCS_EmployeeRequests (employee_name, request_type, vehicle_type, reservation_date, pickup_location, drop_location, status)
+VALUES ('John Doe', 'Booking', 'Car', '2025-01-15', 'Chennai', 'Kolkata', 'Approved');

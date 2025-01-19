@@ -1,3 +1,16 @@
+multi-tenant:
+  schedule:
+    rate: PT1H           # Purge every 1 hour
+  retry:
+    max-attempts: 3            # Retry 3 times
+    backoff: PT10S             # Retry every 10 seconds
+    retryable-exceptions:
+      - java.sql.SQLException
+      - org.springframework.dao.DataAccessException
+  deletion:
+    interval: P1D              # Delete records older than 1 day
+
+
 app:
   tenants:
     - tenantId: "tenant1"
